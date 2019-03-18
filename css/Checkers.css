@@ -1,0 +1,229 @@
+body
+{
+   font-family: 'Noto Sans', sans-serif; 
+}
+
+h3
+{
+    margin: 30px auto;
+    text-align: center;
+    animation-name: Dropdown;
+    animation-direction: normal;
+    animation-fill-mode: forwards;
+    animation-duration: 0.41s;
+    animation-timing-function: ease-out;
+    animation-delay: 0s;
+}
+
+button
+{
+    /* Buttons to reset board, toggle autoplay */
+    position: relative;
+    bottom: -10%;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 15px;
+    opacity: 0.0;
+    
+    animation-name: Dropdown;
+    animation-direction: normal;
+    animation-fill-mode: forwards;
+    animation-duration: 0.61s;
+    animation-timing-function: ease-out;
+    animation-delay: 0s;
+}
+
+.Auto
+{
+    /* Button has been toggled to trigger autoplay */
+    filter: invert(100%);
+}
+
+#playspace
+{
+    margin: 0 auto;
+    position: absolute;
+    width: 100vw;
+    max-width: 500px;
+    height: 100vw;
+    max-height: 500px;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+	display: inline-block;
+    list-style-type: none;
+    text-align: center;
+}
+
+#Board
+{
+    margin: 0 auto;
+    background-color: none;/* lightgray */
+    position: relative;
+    width: 100vw;
+    max-width: 500px;
+    height: 100vw;
+    max-height: 500px;
+    top: 0%;
+    left: 0%;
+	display: inline-block;
+    list-style-type: none;
+    text-align: center;
+}
+
+.Square
+{
+    /* Div used to store checkers or unoccupied spaces */
+    width: 12.5%;
+    height: 12.5%;
+    position:absolute;
+    top: 0;
+    left: 0;
+    transform: scale(0);
+    
+    background-color: black;
+    background-size: cover;
+    background-repeat: no-repeat;
+    
+    animation-name: Expander;
+    animation-direction: normal;
+    animation-fill-mode: forwards;
+    animation-duration: 0.21s;
+    animation-timing-function: ease-out;
+    animation-delay: 0s;
+}
+
+.noplay
+{
+    /* Used purely for aesthetics */
+    background-color: indianred;
+}
+
+.RedPiece
+{
+    /* Used to denote a red checker is on this square */
+    background-image:url(../img/CheckerRed.png);
+}
+
+.RedPiece.King
+{
+    /* Used to denote a red king is on this square */
+    background-image:url(../img/KingRed.png);
+}
+
+.BlackPiece
+{
+    /* Used to denote a black checker is on this square */
+    background-image:url(../img/CheckerBlack.png);
+}
+
+.BlackPiece.King
+{
+    /* Used to denote a black king is on this square */
+    background-image:url(../img/KingBlack.png);
+}
+
+.play
+{
+    /* This class appears when a player makes a move. It exists solely for aesthetic reasons, and is not critical to how the game functions */
+    animation-name: Grow;
+    animation-direction: normal;
+    animation-duration: 0.45s;
+    animation-timing-function: ease-out;
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+}
+
+.Choice
+{
+    background-color: lightblue;
+    z-index: 4;
+    
+    animation-name: BlueSelect;
+    animation-direction: normal;
+    animation-fill-mode: forwards;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+
+}
+
+.Selected:nth-child(n)
+{
+    background-color: lightsteelblue;
+}
+
+#Counter
+{
+    /* Unseen value used to track current turn/player */
+    position: absolute;
+    z-index: -3;
+    opacity: 0;
+}
+
+-webkit-@keyframes Winner {
+    0% {transform: scale(1); opacity: 1; }
+    25% {transform: scale(1); opacity: 0.5; }
+    50% {transform: scale(1); opacity: 0.01; }
+    75% {transform: scale(1); opacity: 0.5; }
+    100% {transform: scale(1); opacity: 1;}
+}
+
+@keyframes Winner {
+    0% {transform: scale(1); opacity: 1; }
+    25% {transform: scale(1); opacity: 0.5; }
+    50% {transform: scale(1); opacity: 0.01; }
+    75% {transform: scale(1); opacity: 0.5; }
+    100% {transform: scale(1); opacity: 1;}
+}
+
+-webkit-@keyframes Expander {
+    0% {transform:translate(-50%, -50%) scale(0);}
+    100% {transform:translate(0%, 0%) scale(1, 1);}
+}
+
+@keyframes Expander {
+    0% {transform:translate(-50%, -50%) scale(0);}
+    100% {transform:translate(0%, 0%) scale(1, 1);}
+}
+
+-webkit-@keyframes Dropdown {
+    0% {transform:translateY(-400%); opacity: 0.0;}
+    100% {transform:translateY(0%); opacity: 1.0;}
+}
+
+@keyframes Dropdown {
+    0% {transform:translateY(-400%); opacity: 0.0;}
+    100% {transform:translateY(0%); opacity: 1.0;}
+}
+
+-webkit-@keyframes BlueSelect {
+    0% {background-color: powderblue;}
+    50% {transform: rotate(180deg);}
+    100% {transform: rotate(360deg); background-color: skyblue;}
+}
+
+@keyframes BlueSelect {
+    0% {transform: rotate(0deg); background-color: powderblue; border-radius: 0;}
+    50% {transform: rotate(0deg); background-color: skyblue; border-radius: 25%;}
+    100% {transform: rotate(0deg); background-color: powderblue; border-radius: 0;}
+}
+
+-webkit-@keyframes Grow {
+    0% {transform: scale(1);  background-size: 0%; background-position: center;}
+    100% {transform: scale(1);  background-size: 100%%; background-position: center;}
+}
+
+@keyframes Grow {
+    0% {transform: scale(1); background-size: 0%; background-position: center;}
+    
+    99% {background-size: 100%; background-position: center;}
+    100% { transform: scale(1); background-size: 100%%; background-position: center;}
+}
+
+@media (max-width: 600px) {
+  /* CSS that should be displayed if width is equal to or less than 600px goes here */
+
+    
+}/* End of mobile/tablet platforms */
