@@ -24,36 +24,34 @@ function Reaction(item)
     }
     else if(item.classList.contains("Choice"))
             {
-             moveChecker(board, document.getElementsByClassName("Selected")[0],item);
-             DeselectAll();
-                
-            // Change inner HTML to reflect current turn
-            turn = parseInt(document.getElementById("Counter").textContent);
-            turn++;
-            turn = turn.toString();
-            document.getElementById("Counter").textContent = turn;
-                
-                // Change message text to indicate turn
-            if(document.getElementsByClassName("BlackPiece").length > 0 && document.getElementsByClassName("RedPiece").length > 0)
+             var check = moveChecker(board, document.getElementsByClassName("Selected")[0],item);
+             
+             if(check) // A piece was just jumped!
+                 { // Can we make another jump immediately?
+                    check = ComboJump(item);
+                 }      
+                 
+                else // No pieces were jumped, just a normal move
                 {
+                    DeselectAll();   
+                } // End of else statement
                 
-            if(turn % 2 == 1)
+                // Change inner HTML to reflect current turn
+                turn = parseInt(document.getElementById("Counter").textContent);
+                if(!check) // Combojump was just executed
                 {
-                 document.getElementById("Message").textContent = "Black Checker's turn";
+                  turn++; 
                 }
-                else
-                {
-                 document.getElementById("Message").textContent = "Red Checker's turn";
-                }
-            } // End of message changing stuff
-           
-            }
+
+                turn = turn.toString();
+                document.getElementById("Counter").textContent = turn;        
+                
+            } // End of moving to chosen space/'Choice'
         else // Default case
             {
                 DeselectAll();
-            }
+            }                
     
-       
     // See if autoplay is on for Black or Red
     var list = document.getElementsByTagName('button');
     if(list[3].classList.contains("Auto") && turn % 2 == 1)
@@ -67,7 +65,7 @@ function Reaction(item)
        setTimeout(getValidMove, 50);
    }
    
-    checkVictory();
+    checkVictory(turn); // Has a player won the game yet?
     
 } // End of Function Reaction()
 
@@ -76,7 +74,6 @@ function GatherBoard()
 {
     var list = document.getElementsByClassName("Square");
     var count = 0;
-    //console.log(list.length);
     var board = [[],[],[],[],[],[],[],[]];
     for(var y = 0; y < 8; y++)
         {
@@ -200,8 +197,10 @@ function RandomizeBoard()
 } // End of function RandomizeBoard
 
 /* Determines if one side has been completely wiped from the board */
-function checkVictory()
+function checkVictory(turn)
 {
+    console.log("VCheck Turn: " + turn);
+    
     var temp = document.getElementById("Message").textContent;
     if(temp == "Red Checkers Win!" || temp == "Black Checkers Win!" || temp == "The, uh, game's over. Just so you know.")
     {
@@ -214,6 +213,14 @@ function checkVictory()
     else if(document.getElementsByClassName("RedPiece").length < 1)
     {
         document.getElementById("Message").textContent = "Black Checkers Win!";
+    }
+    else if(turn % 2 == 1)
+    {
+     document.getElementById("Message").textContent = "Black Checker's turn";
+    }
+    else
+    {
+     document.getElementById("Message").textContent = "Red Checker's turn";
     }
     
     
@@ -307,8 +314,6 @@ function ValidMoves(item, board, turn)
             color = "RedPiece";
             notColor = "BlackPiece";
         }
-    
-    console.log(x + " " + y);
     
     if(turn % 2 == 1 || item.classList.contains("King")) // It is black check's turn / a king's turn
     {
@@ -441,6 +446,8 @@ function newChoice(item)
 /* Takes the checker data from the selected spot and deposits it in the 'choice' square - wipes out any checker data in original spot or between original spot and choice */
 function moveChecker(board, selected, choice)
 {
+    var jump = false; // Set to true if there was a successful jump
+    
     console.log(selected.id + " selected, " + choice.id + " chosen");
     var X1 = parseInt((selected.id).substring(1,2));
     var Y1 = parseInt((selected.id).substring(4,5));
@@ -450,6 +457,8 @@ function moveChecker(board, selected, choice)
     // If either X or Y val is 2 apart from each other it's a jump
     if(Math.abs(X1 - X2) > 1)
    {
+      jump = true;  
+       
       if(Y2 < Y1) // Jumping upwards
       {
         if(X2 < X1) // Jumping up-left
@@ -478,6 +487,7 @@ function moveChecker(board, selected, choice)
       } // End of downwards jumping logic 
        
     // Add combo-jumping logic here if possible
+       ComboJump(selected, X2, Y2);
        
    } // End of jumping logic
     
@@ -504,5 +514,86 @@ function moveChecker(board, selected, choice)
     {
         choice.classList.add("King");
     }
-   
+    
+    return jump; // Triggers second turn if successful jump
+      
 } // End of function moveChecker()
+
+/* Allows player to make consecutive jump after successfully jumping an opponent's piece */
+function ComboJump(selected)
+{
+    console.log("Combojump! " + selected.id);
+    var x = parseInt((selected.id).substring(1,2));
+    var y = parseInt((selected.id).substring(4,5));
+    // Gather board up to see if there's nearby open spaces
+    var board = GatherBoard();
+    var color = "BlackPiece";
+    var Anticolor = "RedPiece";
+    var Move = false; // Determines if another jump is possible
+    
+    // Determine which color checker the selected checker is
+    if(selected.classList.contains("RedPiece"))
+    {
+        color = "RedPiece";
+        Anticolor = "BlackPiece";
+    }
+    
+    DeselectAll(); // Wipe all selected items from last turn
+    selected.classList.add("Selected");
+    
+    if(x < 6) // In at least 3rd from far right
+    {        
+        if(y > 1) // In at least 3rd row from top 
+        {
+            // If 2 down, 2 right is jumpable
+            if(board[x+1][y-1].classList.contains(Anticolor) && !board[x+2][y-2].classList.contains(Anticolor) && !board[x+2][y-2].classList.contains(color))
+            {
+                board[x+2][y-2].classList.add("Choice");
+                Move = true;
+            }
+        } // End of y > 1  
+        if(y < 6) // In at least 3rd row from bottom 
+        {
+            // If 2 down, 2 right is jumpable
+            if(board[x+1][y+1].classList.contains(Anticolor) && !board[x+2][y+2].classList.contains(Anticolor) && !board[x+2][y+2].classList.contains(color))
+            {
+                board[x+2][y+2].classList.add("Choice");
+                Move = true;
+            }
+        } // End of y < 6     
+    } // End of x < 6 IF statement   
+    if(x > 1) // In at least 3rd from far left
+    {
+        if(y > 1) // In at least 3rd row from top 
+        {
+            // If 2 down, 2 right is jumpable
+            if(board[x-1][y-1].classList.contains(Anticolor) && !board[x-2][y-2].classList.contains(Anticolor) && !board[x-2][y-2].classList.contains(color))
+            {
+                board[x-2][y-2].classList.add("Choice");
+                Move = true;
+            }
+        } // End of y > 1  
+        if(y < 6) // In at least 3rd row from bottom 
+        {
+            // If 2 down, 2 right is jumpable
+            if(board[x-1][y+1].classList.contains(Anticolor) && !board[x-2][y+2].classList.contains(Anticolor) && !board[x-2][y+2].classList.contains(color))
+            {
+                board[x-2][y+2].classList.add("Choice");
+                Move = true;
+            }
+        } // End of y < 6     
+    } // End of x > 1 IF statement
+    
+    if(Move) // There's a valid jump we can make!
+    {
+        selected.classList.add("Selected");
+        console.log("There's a valid combojump...");     
+    }
+    else
+    {
+        DeselectAll(); // Deselect all tiles to prevent another jump   
+    }
+ //checkVictory(parseInt(document.getElementById("Counter").textContent));
+    return Move;
+    
+} // End of Function ComboJump
