@@ -40,14 +40,19 @@ function Reaction(item)
                 turn = parseInt(document.getElementById("Counter").textContent);
                 if(!check) // Combojump was just executed
                 {
-                  turn++; 
+                  turn++;
+                  document.getElementById("Message").textContent = " ";
+                }
+                else // Combojump available!
+                {
+                    document.getElementById("Message").textContent = "One more jump!";
                 }
 
                 turn = turn.toString();
                 document.getElementById("Counter").textContent = turn;        
                 
             } // End of moving to chosen space/'Choice'
-        else // Default case
+        else if(document.getElementById("Message").textContent != "One more jump!")// Default case
             {
                 DeselectAll();
             }                
@@ -154,11 +159,16 @@ function RandomizeBoard()
     // Reset board to ensure pieces aren't allocated based on current game
     ResetBoard();
     
+    // Randomize whose turn it is
+    var i = Math.floor(Math.random() * 8); // Used for determining turn
+    checkVictory(i);
+    document.getElementById("Counter").textContent = i.toString();
+    
     // Remove all noplay spaces from the board
     var list = document.getElementsByClassName("Square");
     var newList = [];
     var counter = 20;
-    var i = 0; // Used for For loop and while loop
+    i = 0; // Used for For loop and while loop
     for(i = 0; i < list.length; i++)
     {
         list[i].classList.remove("RedPiece");
@@ -202,7 +212,12 @@ function checkVictory(turn)
     console.log("VCheck Turn: " + turn);
     
     var temp = document.getElementById("Message").textContent;
-    if(temp == "Red Checkers Win!" || temp == "Black Checkers Win!" || temp == "The, uh, game's over. Just so you know.")
+    
+    if(temp == "One more jump!")
+   {
+       document.getElementById("Message").textContent = "One more jump!";
+   }
+    else if(temp == "Red Checkers Win!" || temp == "Black Checkers Win!" || temp == "The, uh, game's over. Just so you know.")
     {
         document.getElementById("Message").textContent = "The, uh, game's over. Just so you know.";
     }
@@ -550,6 +565,7 @@ function ComboJump(selected)
             {
                 board[x+2][y-2].classList.add("Choice");
                 Move = true;
+                board[x+2][y-2].style.animationDuration = "3s";
             }
         } // End of y > 1  
         if(y < 6) // In at least 3rd row from bottom 
@@ -559,6 +575,7 @@ function ComboJump(selected)
             {
                 board[x+2][y+2].classList.add("Choice");
                 Move = true;
+                board[x+2][y+2].style.animationDuration = "3s";
             }
         } // End of y < 6     
     } // End of x < 6 IF statement   
@@ -571,6 +588,7 @@ function ComboJump(selected)
             {
                 board[x-2][y-2].classList.add("Choice");
                 Move = true;
+                board[x-2][y-2].style.animationDuration = "3s";
             }
         } // End of y > 1  
         if(y < 6) // In at least 3rd row from bottom 
@@ -580,6 +598,7 @@ function ComboJump(selected)
             {
                 board[x-2][y+2].classList.add("Choice");
                 Move = true;
+                board[x-2][y+2].style.animationDuration = "3s";
             }
         } // End of y < 6     
     } // End of x > 1 IF statement
