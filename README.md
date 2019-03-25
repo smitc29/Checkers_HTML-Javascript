@@ -1,5 +1,5 @@
 # Checkers_HTML-Javascript
-A simple version of Checkers with HTML, CSS, and Javascripting for logic.
+A simple version of Checkers with HTML, CSS, and Javascripting for logic. Uses MIT liscense. If there's a bug or flaw, please let me know and I'll attempt to resolve it as soon as possible!
 
 ## History
 You should be able to to view the basic development of the project with the Java History Branch. The development for the project's files were updated as follows:
