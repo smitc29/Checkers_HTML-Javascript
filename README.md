@@ -13,3 +13,5 @@ You should be able to to view the basic development of the project with the Java
 - v10 - 3/18/2019 - (Multijump logic, CSS updated)
 - v11 - 3/19/2019 - (Multijump logic)
 - v12 - 3/25/2019 - (Prevented illegal multijump moves)
+- v13 - 8/14/2019 - (Made AI aggressive and searches for possible jumps when moving)
+
