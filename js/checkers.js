@@ -62,12 +62,12 @@ function Reaction(item)
     if(list[3].classList.contains("Auto") && turn % 2 == 1)
    {
        console.log("Black autoplay is active...");
-       setTimeout(getValidMove, 50);
+       setTimeout(makeValidMove, 500);
    }
     if(list[2].classList.contains("Auto") && turn % 2 == 0)
    {
        console.log("Red autoplay is active...");
-       setTimeout(getValidMove, 50);
+       setTimeout(makeValidMove, 500);
    }
    
     checkVictory(turn); // Has a player won the game yet?
@@ -242,8 +242,10 @@ function checkVictory(turn)
 } // End of Function checkVictory
 
 /* Returns a random tile with either a current player's checker or viable move for the player */
-function getValidMove()
+function makeValidMove()
 {
+    var i = 0;
+    
     if(document.getElementsByClassName("BlackPiece").length > 0 && document.getElementsByClassName("RedPiece").length > 0)
     {
     
@@ -254,52 +256,59 @@ function getValidMove()
         color = "BlackPiece";
     }
     
-    // Remove all noplay spaces from the board
-    var list = document.getElementsByClassName("Square");
-    var newList = [];
-    var i = 0; // Used for For loop and while loop
-    var check = false; // used to determine if selected space is valid
-    
-    // Strip all noplay values from 'list'
-    for(i = 0; i < list.length; i++)
+    // If there's no available moves, pick another checker of your color 
+    if(document.getElementsByClassName("Choice").length < 1)
     {
-        if(!list[i].classList.contains("noplay"))
-        {
-            newList.push(list[i]);
-        }
+        // List is exclusively current player's checkers
+        var validMoves = "Square " + color;
+        var list = document.getElementsByClassName(validMoves);
+        i = Math.floor(Math.random() * list.length);
+        Reaction(list[i]);
+        
     }
-    
-    // List should now only contain playable spaces
-    list = newList;
-    // Set 'i' for next loop
-    i = Math.floor(Math.random() * list.length);
-    
-    // Check to see if there's any 'choice' tiles in play
-    newList = document.getElementsByClassName("Choice");
-    if(newList.length > 0)
+        else // At least 1 'choice' is available
     {
-        i = 0;
-        var temp = Math.floor(Math.random()*newList.length);
-        while(i < list.length && newList[temp].id != list[i].id)
+        // Grab selected tile and x/y coordinates
+        var selected = document.getElementsByClassName("Selected");
+        selected = selected[0];
+        var selectX = parseInt((selected.id).substring(1,2));
+        var selectY = parseInt((selected.id).substring(4,5));
+        
+        // Grab possible movements with this piece
+        var options = document.getElementsByClassName("Choice");
+        var JumpOps = [];
+        var optX;
+        var optY;
+        
+        // Go through each possible move CPU can make; it if can jump, it will
+         for(var count = 0; count < options.length; count++)
         {
-            i++;
-        }
-    }  // End of IF statement
-    else
-    { // There's currently no valid choice tiles 
-        while(!check)
-        {
-            i = Math.floor(Math.random() * list.length);
-
-            if(list[i].classList.contains("Choice") || list[i].classList.contains(color)) // Tile must be correct color or viable choice...
+            optX = parseInt((options[count].id).substring(1,2));
+            optY = parseInt((options[count].id).substring(4,5));
+            
+            // If viable move is more than 1 tile away, add it possible jumps
+            if(Math.abs(selectX - optX) > 1 && Math.abs(selectY - optY) > 1)
             {
-               check = true; 
-            }
-        } // End of while loop
-    } // End of ELSE statement
-    
-    console.log("Autoplaying with tile " + list[i].id);
-    Reaction(list[i]);  
+                JumpOps.push(options[count]);
+            }           
+        } // End of jump gathering process
+        
+        // If 1 or more jump opportunities was found, make jump
+        if(JumpOps.length > 0)
+        {
+                i = Math.floor(Math.random() * JumpOps.length);
+                console.log("Autoplaying with tile " + JumpOps[i].id);
+                Reaction(JumpOps[i]);
+        }
+        
+        else // No jumps were available for selected piece, select random choice and make it 
+        {
+                i = Math.floor(Math.random() * options.length);
+                console.log("Autoplaying with tile " + options[i].id);
+                Reaction(options[i]);
+        }
+        
+    } // End of Choices detected
         
     } // End of massive IF statement
     else
@@ -308,7 +317,7 @@ function getValidMove()
     }
     
     
-} // End of function getValidMove
+} // End of function makeValidMove
 
 /* Apply 'Choice' to all valid moves spaces */
 function ValidMoves(item, board, turn)
