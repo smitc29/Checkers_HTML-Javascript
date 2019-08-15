@@ -251,9 +251,11 @@ function makeValidMove()
     
     var turn = parseInt(document.getElementById("Counter").textContent);
     var color = "RedPiece";
+    var opp = "BlackPiece";
     if(turn % 2 == 1)
     {
         color = "BlackPiece";
+        opp = "RedPiece";
     }
     
     // If there's no available moves, pick another checker of your color 
@@ -275,7 +277,7 @@ function makeValidMove()
         var selectY = parseInt((selected.id).substring(4,5));
         
         // Grab possible movements with this piece
-        var options = document.getElementsByClassName("Choice");
+        var options = shuffle(document.getElementsByClassName("Choice"));
         var JumpOps = [];
         var optX;
         var optY;
@@ -285,13 +287,72 @@ function makeValidMove()
         {
             optX = parseInt((options[count].id).substring(1,2));
             optY = parseInt((options[count].id).substring(4,5));
+            console.log("Determing potential risks for tile [" + (optX) + "][" + (optY) + "]");
             
             // If viable move is more than 1 tile away, add it possible jumps
             if(Math.abs(selectX - optX) > 1 && Math.abs(selectY - optY) > 1)
             {
                 JumpOps.push(options[count]);
-            }           
-        } // End of jump gathering process
+            }
+            
+            // Determine if moving the checker to this tile will make it vulnerable to being jumped. First, only consider moves that put it away from an edge... 
+            if(optX > 0 && optY > 0 && optX < 7 && optY < 7)
+            {
+                // Now, determine if any of the 4 corners of this space could be used to attack it...
+                var danger = false;
+                
+                // Top Left to bottom right(-X,-Y to +X,+Y)                
+                if(document.getElementById("[" + (optX-1) + "][" + (optY-1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX+1) + "][" + (optY+1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX+1) + "][" + (optY+1) + "]").classList.contains(color) 
+                   &&                    !document.getElementById("[" + (optX+1) + "][" + (optY+1) + "]").classList.contains("Selected"))
+                {
+                    console.log("Determing potential attack from tile [" + (optX-1) + "][" + (optY-1) + "]");
+                    danger = true;
+                }
+                
+                // Top Right to bottom left(+X,-Y to -X,+Y)
+                if(document.getElementById("[" + (optX+1) + "][" + (optY-1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX-1) + "][" + (optY+1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX-1) + "][" + (optY+1) + "]").classList.contains(color) && 
+                   !document.getElementById("[" + (optX-1) + "][" + (optY+1) + "]").classList.contains("Selected"))
+                {
+                    console.log("Determing potential attack from tile [" + (optX+1) + "][" + (optY-1) + "]"); 
+                    danger = true;
+                }
+                
+                // Bottom left to top right (-X,+Y to +X,-Y)
+                if(document.getElementById("[" + (optX-1) + "][" + (optY+1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX+1) + "][" + (optY-1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX+1) + "][" + (optY-1) + "]").classList.contains(color) && 
+                   !document.getElementById("[" + (optX+1) + "][" + (optY-1) + "]").classList.contains("Selected"))
+                {
+                    console.log("Determing potential attack from tile [" + (optX-1) + "][" + (optY+1) + "]");
+                    danger = true;
+                }
+                
+                // Bottom right to top left (+X,+Y to -X,-Y)
+                if(document.getElementById("[" + (optX+1) + "][" + (optY+1) + "]").classList.contains(opp) && 
+                   !document.getElementById("[" + (optX-1) + "][" + (optY-1) + "]").classList.contains(opp) &&
+                   !document.getElementById("[" + (optX-1) + "][" + (optY-1) + "]").classList.contains(color) && 
+                   !document.getElementById("[" + (optX-1) + "][" + (optY-1) + "]").classList.contains("Selected"))
+                {
+                    console.log("Determing potential attack from tile [" + (optX+1) + "][" + (optY+1) + "]");
+                    danger = true;
+                }
+                
+                // If there is more than 1 possible move, remove this tile from possible moves
+                if(danger && options.length > 1)
+                {
+                    JumpOps.pop();
+                    options[count].classList.remove("Choice");
+                    options = shuffle(document.getElementsByClassName("Choice"));
+                }
+                
+                 
+            } // End of removing dangerous choices 
+            
+        } // End of jump gathering process / eliminating dangerous moves
         
         // If 1 or more jump opportunities was found, make jump
         if(JumpOps.length > 0)
@@ -625,3 +686,23 @@ function ComboJump(selected)
     return Move;
     
 } // End of Function ComboJump
+
+/* Shuffle order of contents in array */
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
