@@ -345,9 +345,8 @@ function makeValidMove()
                 if(danger && options.length > 1)
                 {
                     JumpOps.pop();
-                    options.
-                    console.log(options);
-                    options.splice(count,1);
+                    options[count].classList.remove("Choice");
+                    options = shuffle(document.getElementsByClassName("Choice"));
                 }
                 
                  
