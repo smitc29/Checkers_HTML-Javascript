@@ -15,3 +15,4 @@ You should be able to to view the basic development of the project with the Java
 - v12 - 3/25/2019 - (Prevented illegal multijump moves)
 - v13 - 8/14/2019 - (Made AI aggressive and searches for possible jumps in choices when moving)
 - v14 - 8/15/2019 - (Made AI decide safest move to take after randomly selecting a checker)
+- v15 - 8/28/2019 - (Made AI more pragmatic, using new function and replaced older one)
