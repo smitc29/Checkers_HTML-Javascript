@@ -3,10 +3,12 @@
 
 function Reaction(item) 
 {
-    console.log(item.id);
+    console.log(item.id + " clicked");
     var board = GatherBoard();
     // Determine who's turn it is, stored in 'Counter' id
     var turn = parseInt(document.getElementById("Counter").textContent);
+    var auto = parseInt(document.getElementById("AutoplayMode").textContent) > 0;
+    
     //console.log(turn);
     
     //  Test to see if it's Black Check's turn
@@ -15,12 +17,24 @@ function Reaction(item)
         DeselectAll();
         item.classList.add("Selected");
         ValidMoves(item, board, turn);
+        
+        if(auto)
+        {
+            return document.getElementsByClassName("Choice");
+        }
+        
     }
     else if(turn % 2 == 0 && item.classList.contains("RedPiece"))
     {
         DeselectAll();
         item.classList.add("Selected");
         ValidMoves(item, board, turn);
+        
+        if(auto)
+        {
+            return document.getElementsByClassName("Choice");
+        }
+        
     }
     else if(item.classList.contains("Choice"))
             {
@@ -62,12 +76,12 @@ function Reaction(item)
     if(list[3].classList.contains("Auto") && turn % 2 == 1)
    {
        console.log("Black autoplay is active...");
-       setTimeout(makeValidMove, 500);
+       setTimeout(smartMove, 500);
    }
     if(list[2].classList.contains("Auto") && turn % 2 == 0)
    {
        console.log("Red autoplay is active...");
-       setTimeout(makeValidMove, 500);
+       setTimeout(smartMove, 500);
    }
    
     checkVictory(turn); // Has a player won the game yet?
@@ -241,13 +255,178 @@ function checkVictory(turn)
     
 } // End of Function checkVictory
 
+
+function smartMove()
+{
+    console.log("smartMove function start");
+    
+    // Determine who's turn it is
+    var turn = parseInt(document.getElementById("Counter").textContent);
+    var color = "RedPiece";
+    var opp = "BlackPiece";
+    if(turn % 2 == 1)
+    {
+        color = "BlackPiece";
+        opp = "RedPiece";
+    }
+      
+    // Gather up all of a player's pieces
+    var validMoves = "Square " + color;
+    var list = document.getElementsByClassName(validMoves);
+    var moves = [];
+    var temp = 0;
+    var i = 0;
+    
+    // Go through pieces; add any pieces that can be moved to move[] array
+    for(i = 0; i < list.length; i++)
+    {
+        document.getElementById("AutoplayMode").textContent = 1;
+        if(Reaction(list[i]).length >= 1)
+        {
+            moves.push(list[i]);
+            console.log(moves[temp]);
+            temp++;                 
+        }
+        document.getElementById("AutoplayMode").textContent = 0;
+        DeselectAll(); // Wipe all selected items from data gathering
+        
+        // Set Reaction to act as normal again 
+     
+    } // End of checker gathering loop
+    
+    // moves[] is an array of each piece we can currently move. 
+    console.log("\n These pieces can be moved: ");
+    for(i = 0; i < moves.length; i++)
+    {
+        console.log(moves[i].id);
+    }
+    
+    // Determine if any of the checkers that can move are in danger; if so, get them out of harm's way
+    var vitalMove = [];
+    for(i = 0; i < moves.length; i++)
+    {
+        temp = inHarmsWay(document.getElementById(moves[i].id), color, opp);
+        if(temp)
+        {
+            vitalMove.push(moves[i]);
+        }
+    } // End of danger-proofing loop
+    
+    if(vitalMove.length > 0)
+    {
+       console.log("\n These pieces are in danger: ");
+        for(i = 0; i < vitalMove.length; i++)
+        {
+            console.log(vitalMove[i].id);
+        }
+        
+        // Randomly select a move and make it
+        i = Math.floor(Math.random() * vitalMove.length);
+        Reaction(document.getElementById(vitalMove[i].id));
+        
+    } // VitalMove was empty to reach this point
+    
+    
+    DeselectAll(); // Ensure nothing is selected atm
+    
+    // See if autoplay is on for Black or Red
+    list = document.getElementsByTagName('button');
+    if(list[3].classList.contains("Auto") && turn % 2 == 1 || list[2].classList.contains("Auto") && turn % 2 == 0)
+   {
+       // Default response for making a move
+    // Click on one of the movable checkers...
+       console.log(list[2].classList.contains("Auto") + " " + list[3].classList.contains("Auto") + " " + turn);
+    document.getElementById("AutoplayMode").textContent = 1;
+    i = Math.floor(Math.random() * moves.length);
+    Reaction(document.getElementById(moves[i].id));
+    
+    // Randomly select a place to move the checker to based on 'Choice's available
+    document.getElementById("AutoplayMode").textContent = 0;
+    temp = document.getElementsByClassName("Choice");
+    i = Math.floor(Math.random() * temp.length);
+    Reaction(document.getElementById(temp[i].id));
+   }
+    
+    
+    
+    
+    
+    /* Generate a list of values 0-11 to determine order pieces will be called in
+    for(i = 0; i < list.length; i++)
+    {
+        temp = Math.floor(Math.random() * list.length);
+        
+        while(moves.includes(temp))
+       {
+          temp = Math.floor(Math.random() * list.length);   
+       }
+          
+        moves.push(temp);
+        
+    } */ //end of For loop, list is randomized 0 to len-1 for list
+    
+    
+    
+   
+    
+    
+     
+     
+     
+    
+    
+    return false;
+}
+
+/* Take a checker and determine if it is danger of being jumped by an opponent. If it is, returns true */
+function inHarmsWay(check, color, opp)
+{
+    
+    var Xval = parseInt((check.id).substring(1,2));
+    var Yval = parseInt((check.id).substring(4,5));
+    
+    // If a checker is on the edge of a playing field, it cannot be jumped; return false 
+    if(Xval > 6 || Xval < 1 || Yval > 6 || Yval < 1)
+    {
+       return false;
+    }
+    
+    // Attack from Upper-left (-X,-Y) to bottom right
+    if(document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(color))
+    {
+       return true;
+    }
+    
+    // Attack from Upper-right (+X,-Y) to bottom left
+    if(document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(color))
+    {
+       return true;
+    }
+    
+    // Attack from lower-left (-X,+Y) to upper right
+    if(document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(color))
+    {
+       return true;
+    }
+    
+    // Attack from lower-right (+X,+Y) to upper left
+    if(document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(color))
+    {
+       return true;
+    }
+      
+    return false;
+    
+} // End of inHarmsWay function
+
+
 /* Returns a random tile with either a current player's checker or viable move for the player */
 function makeValidMove()
 {
-    var i = 0;
+
+    setTimeout(smartMove, 500);
     
-    if(document.getElementsByClassName("BlackPiece").length > 0 && document.getElementsByClassName("RedPiece").length > 0)
-    {
+    var i = 0;
     
     var turn = parseInt(document.getElementById("Counter").textContent);
     var color = "RedPiece";
@@ -257,6 +436,9 @@ function makeValidMove()
         color = "BlackPiece";
         opp = "RedPiece";
     }
+    
+    if(document.getElementsByClassName("BlackPiece").length > 0 && document.getElementsByClassName("RedPiece").length > 0)
+    {
     
     // If there's no available moves, pick another checker of your color 
     if(document.getElementsByClassName("Choice").length < 1)
@@ -689,20 +871,25 @@ function ComboJump(selected)
 
 /* Shuffle order of contents in array */
 function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+    
+    //console.log(array);
+  var randomIndex = 0;
+  var len = array.length;
 
   // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
+  for(var i = 0; i < len; i++) {
 
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
+    // Pick a random element...
+    randomIndex = Math.floor(Math.random() * len);
+ 
     // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
+    var temporaryValue = array[i];
+    array[i] = 1;
     array[randomIndex] = temporaryValue;
+      
   }
 
+  //console.log(array);
   return array;
-}
+    
+} // End of shuffle() function
