@@ -341,36 +341,8 @@ function smartMove()
     
     DeselectAll(); // Ensure nothing is selected atm
     
-    autoMove(moves, turn);
-    
-    
-    
-    
-    
-    /* Generate a list of values 0-11 to determine order pieces will be called in
-    for(i = 0; i < list.length; i++)
-    {
-        temp = Math.floor(Math.random() * list.length);
-        
-        while(moves.includes(temp))
-       {
-          temp = Math.floor(Math.random() * list.length);   
-       }
-          
-        moves.push(temp);
-        
-    } */ //end of For loop, list is randomized 0 to len-1 for list
-    
-    
-    
-   
-    
-    
-     
-     
-     
-    
-    
+    //autoMove(moves, turn);
+       
     return false;
 }
 
@@ -384,7 +356,6 @@ function inHarmsWay(check, color, opp)
     // If a checker is on the edge of a playing field, it cannot be jumped; return false 
     if(Xval > 6 || Xval < 1 || Yval > 6 || Yval < 1)
     {
-        console.log(Xval + "_" + Yval + " is at an edge, returning False");
        return false;
     }
     
@@ -477,8 +448,13 @@ function prioritize(checks, color, opp)
                 // If this move puts the check on any edge of the board, increase its value by 2 again
                 if(Xmove == 0 || Ymove == 0 || Xmove == 7 || Ymove == 7)
                     {
-                        value += 2;
-                    }
+                        value += 1;
+                        if(checks[i].classList.contains("King"))
+                            {
+                                value -= 3;
+                            }
+                            
+                    } // End of edge favoring
                 
                 // Determine if this move would put the Check in danger; if it would, reduce value by 3
                 if(inHarmsWay(temp[j], color, opp))
@@ -508,12 +484,18 @@ function prioritize(checks, color, opp)
     console.log(options);
     console.log(highest);
     
-    document.getElementById("AutoplayMode").textContent = 1;
-    temp = Reaction(checks[highest[1]]);
+    
     
 setTimeout(function () {  
-    document.getElementById("AutoplayMode").textContent = 0;
-    Reaction(temp[highest[2]]);
+    
+    document.getElementById("AutoplayMode").textContent = 1;
+    temp = Reaction(checks[highest[1]]);
+    console.log(temp[highest[2]]);
+    
+    setTimeout(function () { 
+        console.log(temp[highest[2]]);
+    Reaction(temp[highest[2]]); }, 500);
+      
 }, 500);
     
     
