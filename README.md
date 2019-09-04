@@ -17,3 +17,4 @@ You should be able to to view the basic development of the project with the Java
 - v14 - 8/15/2019 - (Made AI decide safest move to take after randomly selecting a checker)
 - v15 - 8/28/2019 - (Made AI more pragmatic, using new function and replaced older one)
 - v16 - 8/29/2019 - (AI assigns a 'score' to each move it can make, then moves accordingly)
+- v18 - 9/4/2019 - (AI can no longer change pieces when presented with a combojump)
