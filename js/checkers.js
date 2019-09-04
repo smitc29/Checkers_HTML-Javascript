@@ -258,6 +258,18 @@ function checkVictory(turn)
 
 function smartMove()
 {
+    var i = 0;
+     
+    // If Choices are available immediately make them, Combojump must be active if this is happening
+    while(document.getElementsByClassName("Choice").length > 0 && document.getElementById("Message").innerHTML.includes("One more jump"))
+        {
+            // Combojump has 2 moves at most, pick it at random
+            document.getElementById("AutoplayMode").textContent = 1;
+            i = Math.floor(Math.random() * document.getElementsByClassName("Choice").length);
+          Reaction(document.getElementsByClassName("Choice")[i]);
+            
+        }
+     
     var turn = parseInt(document.getElementById("Counter").textContent);
     var list = document.getElementsByTagName('button');
     
@@ -270,10 +282,7 @@ function smartMove()
         console.log(list[2].classList.contains("Auto") + list[3].classList.contains("Auto") + turn);
         return false;
     }
-    
-    
-    
-    
+      
     // Determine who's turn it is
     var color = "RedPiece";
     var opp = "BlackPiece";
@@ -288,8 +297,7 @@ function smartMove()
     list = document.getElementsByClassName(validMoves);
     var moves = [];
     var temp = 0;
-    var i = 0;
-    
+       
     // Go through pieces; add any pieces that can be moved to move[] array
     for(i = 0; i < list.length; i++)
     {
@@ -316,6 +324,8 @@ function smartMove()
     
     // Determine if any of the checks can jump another piece via offensive move
     var vitalMove = [];
+    
+    
    
     // Determine if any moves can jump another piece; if so, prioritize making jumps over all other logic
     if(prioritize(moves, color, opp))
@@ -409,7 +419,7 @@ function prioritize(checks, color, opp)
     options = []; 
     temp = [];
     var sublist = []; // Used to track individual moves
-    var highest = [-10, 0, 0]; // Store the highest priority move to be made and make it after all other moves have been considered   
+    var highest = [-50, 0, 0]; // Store the highest priority move to be made and make it after all other moves have been considered   
     value = 0;
     
   
@@ -434,24 +444,34 @@ function prioritize(checks, color, opp)
                }
         }
         
+        
+        
         // Compare X values between this check and every possible move; if it's greater than 1, it's a jump, increase value by 2 of this potential move
         for(j = 0; j < temp.length; j++)
             {
                 Xmove = parseInt((temp[j].id).substring(1,2));
                 Ymove = parseInt((temp[j].id).substring(4,5));
-                               
+                    
+                // If this move is a jump, raise the value of the move to encourage jumping when possible
                 if(Math.abs(Xcheck - Xmove) > 1)
                    {
-                       value += 2;
+                       value += 3;
                    }
                 
-                // If this move puts the check on any edge of the board, increase its value by 2 again
+                // Make Kings move towards the center of the board
+                if(checks[i].classList.contains("King"))
+                {
+                    value -= Math.abs(4 - Xmove);
+                    value -= Math.abs(4 - Ymove);
+                }
+                
+                // If this move puts the check on any edge of the board, increase its value by 1 again
                 if(Xmove == 0 || Ymove == 0 || Xmove == 7 || Ymove == 7)
                     {
                         value += 1;
                         if(checks[i].classList.contains("King"))
                             {
-                                value -= 3;
+                                value -= 12;
                             }
                             
                     } // End of edge favoring
@@ -480,23 +500,22 @@ function prioritize(checks, color, opp)
                
     } // End of check loop / movable checks
     
+    // Output to console the logistics of how safe each move is in the immediate future
     console.log(checks);
     console.log(options);
     console.log(highest);
-    
-    
-    
+      
 setTimeout(function () {  
     
     document.getElementById("AutoplayMode").textContent = 1;
     temp = Reaction(checks[highest[1]]);
-    console.log(temp[highest[2]]);
+    //console.log(temp[highest[2]]);
     
-    setTimeout(function () { 
-        console.log(temp[highest[2]]);
-    Reaction(temp[highest[2]]); }, 500);
-      
-}, 500);
+    // Keep making moves if comboJump is presented
+            setTimeout(function () { 
+            Reaction(temp[highest[2]]); }, 250);
+    
+}, 250);
     
     
     // No moves were made, return false
