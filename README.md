@@ -21,3 +21,4 @@ You should be able to to view the basic development of the project with the Java
 - v19 - 9/4/2019 - (AI becomes more aggressive when opponent has fewer pieces)
 - v21 - 9/5/2019 - (AI understands has a wider definition of dangerous moves)
 - v24 - 9/5/2019 - (AI anticipates potential attacks whenever possible and takes countermeasures)
+- v25 - 9/5/2019 - (AI Kings will jump targets even if it'd move them onto an edge)
