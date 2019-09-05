@@ -181,7 +181,7 @@ function RandomizeBoard()
     // Remove all noplay spaces from the board
     var list = document.getElementsByClassName("Square");
     var newList = [];
-    var counter = 20;
+    var counter = 18;
     i = 0; // Used for For loop and while loop
     for(i = 0; i < list.length; i++)
     {
@@ -564,7 +564,7 @@ function prioritize(checks, color, opp)
                 if(Xmove == 0 || Ymove == 0 || Xmove == 7 || Ymove == 7)
                     {
                         value += 1;
-                        if(checks[i].classList.contains("King"))
+                        if(checks[i].classList.contains("King") && !isJump)
                             {
                                 value -= 90;
                             }
