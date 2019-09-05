@@ -343,12 +343,6 @@ function smartMove()
         
     } // VitalMove was empty to reach this point
     
-    
-    
-    
-    
-    // Generic movement is all that's left 
-    
     DeselectAll(); // Ensure nothing is selected atm
     
     //autoMove(moves, turn);
@@ -370,27 +364,41 @@ function inHarmsWay(check, color, opp)
     }
     
     // Attack from Upper-left (-X,-Y) to bottom right
-    if(document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(color))
+    // Opponent is in upper-left, bottom-right is empty
+    if(document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(color) && !document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains("Selected"))
     {
-       return true;
+        // Only allow the danger to be detected if the attacker is a black piece or Red king
+        if(opp.includes("Black") || (opp.includes("Red") && document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains("King")))
+        {console.log("Upper-left space is potentially dangerous!");
+            return true;}
+        
     }
     
     // Attack from Upper-right (+X,-Y) to bottom left
-    if(document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(color))
+    if(document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(color) && !document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains("Selected"))
     {
-       return true;
+       // Only allow the danger to be detected if the attacker is a black piece or Red king
+        if(opp.includes("Black") || (opp.includes("Red") && document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains("King")))
+        {console.log("Upper-right space is potentially dangerous!");
+            return true;}
     }
     
     // Attack from lower-left (-X,+Y) to upper right
-    if(document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(color))
+    if(document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains(color) && !document.getElementById("[" + (Xval+1) + "][" + (Yval-1) + "]").classList.contains("Selected"))
     {
-       return true;
+       // Only allow the danger to be detected if the attacker is a red piece or Black king
+        if(opp.includes("Red") || (opp.includes("Black") && document.getElementById("[" + (Xval-1) + "][" + (Yval+1) + "]").classList.contains("King")))
+        {console.log("Bottom-left space is potentially dangerous!");
+            return true;}
     }
     
     // Attack from lower-right (+X,+Y) to upper left
-    if(document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(color))
+    if(document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(opp) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains(color) && !document.getElementById("[" + (Xval-1) + "][" + (Yval-1) + "]").classList.contains("Selected"))
     {
-       return true;
+       // Only allow the danger to be detected if the attacker is a red piece or Black king
+        if(opp.includes("Red") || (opp.includes("Black") && document.getElementById("[" + (Xval+1) + "][" + (Yval+1) + "]").classList.contains("King")))
+        {console.log("Bottom-right space is potentially dangerous!");
+            return true;}
     }
       
     return false;
@@ -418,11 +426,11 @@ function prioritize(checks, color, opp)
     var Xmove = 0, Ymove = 0;
     options = []; 
     temp = [];
+    var message = "";
+    var isJump = false;
     var sublist = []; // Used to track individual moves
     var highest = [-50, 0, 0]; // Store the highest priority move to be made and make it after all other moves have been considered   
     value = 0;
-    
-  
     
     // Determine if any of these moves can make jumps; if they can, raise that check's value by 2; higher values mean greater odds of being chosen as a move
     document.getElementById("AutoplayMode").textContent = 1;
@@ -451,19 +459,46 @@ function prioritize(checks, color, opp)
             {
                 Xmove = parseInt((temp[j].id).substring(1,2));
                 Ymove = parseInt((temp[j].id).substring(4,5));
-                    
-                // If this move is a jump, raise the value of the move to encourage jumping when possible
-                if(Math.abs(Xcheck - Xmove) > 1)
-                   {
-                       value += 3;
-                   }
                 
-                // Make Kings move towards the center of the board
+                if(Math.abs(Xcheck - Xmove) > 1)
+                {
+                    isJump = true;
+                }
+                
+                // Make Kings move towards the center of the board; I tried with absolute values but it wasn't working out...
                 if(checks[i].classList.contains("King"))
                 {
-                    value -= Math.abs(4 - Xmove);
-                    value -= Math.abs(4 - Ymove);
-                }
+                    value -= 12;
+                    
+                    // React with X values
+                    if(0 < Xmove < 7)
+                    {
+                        value += 2;
+                    }
+                    if(1 < Xmove < 6)
+                    {
+                        value += 2;
+                    }
+                    if(2 < Xmove < 5)
+                    {
+                        value += 4;
+                    }
+                    
+                    // React with Y values
+                    if(0 < Ymove < 7)
+                    {
+                        value += 2;
+                    }
+                    if(1 < Ymove < 6)
+                    {
+                        value += 2;
+                    }
+                    if(2 < Ymove < 5)
+                    {
+                        value += 4;
+                    }
+                     
+                } // End of king IF statement
                 
                 // If this move puts the check on any edge of the board, increase its value by 1 again
                 if(Xmove == 0 || Ymove == 0 || Xmove == 7 || Ymove == 7)
@@ -471,25 +506,56 @@ function prioritize(checks, color, opp)
                         value += 1;
                         if(checks[i].classList.contains("King"))
                             {
-                                value -= 12;
+                                value -= 10;
                             }
                             
                     } // End of edge favoring
                 
-                // Determine if this move would put the Check in danger; if it would, reduce value by 3
-                if(inHarmsWay(temp[j], color, opp))
+                // If this move is a jump that is considered dangerous, only provide a slight bonus to the movement's value
+                if(isJump && inHarmsWay(temp[j], color, opp))
+                   {
+                       value += 2;
+                       
+                       // Encourage kings to be aggressive 
+                       if(checks[i].classList.contains("King"))
+                       {
+                            value += 10;
+                       }
+                       
+                       // the fewer opponent pieces are left, the greater priority this jump should have
+                       value += (12 - document.getElementsByClassName(opp).length);
+                       
+                   } else if(inHarmsWay(temp[j], color, opp))
                     {
                         console.log(temp[j].id + " is a dangerous move, reducing its priority");
-                        value -= 3;
+                        value -= 10;
                     }
+                else if(isJump)
+                   {
+                       value += 15;
+                       // the fewer opponent pieces are left, the greater priority this jump should have
+                       value += (12 - document.getElementsByClassName(opp).length) * 2;
+                   }
+                
+                // If this move is a jump, raise the value of the move to encourage jumping when possible
+                
                 
                 sublist.push(value);
+                
+                // If the current value is greater or equal to the highest recorded value, prioritize this move... maybe
                 if(value > highest[0])
                     {
                         highest[0] = value;
                         highest[1] = i;
                         highest[2] = j;
-                        console.log("Current selection should be option " + i + " - " + (sublist.length-1));
+                        message = ("Current selection should be option " + i + " - " + (sublist.length-1) + " = " + temp[j].id);
+                    }
+                else if(value == highest[0] && Math.random() > 0.7)
+                    {
+                        highest[0] = value;
+                        highest[1] = i;
+                        highest[2] = j;
+                        message = ("Current selection should be option " + i + " - " + (sublist.length-1) + " = " + temp[j].id);
                     }
                   
             } // End of move loop / available moves for this checker
@@ -504,6 +570,8 @@ function prioritize(checks, color, opp)
     console.log(checks);
     console.log(options);
     console.log(highest);
+    console.log(message);
+    
       
 setTimeout(function () {  
     
