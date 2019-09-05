@@ -19,3 +19,4 @@ You should be able to to view the basic development of the project with the Java
 - v16 - 8/29/2019 - (AI assigns a 'score' to each move it can make, then moves accordingly)
 - v18 - 9/4/2019 - (AI can no longer change pieces when presented with a combojump)
 - v19 - 9/4/2019 - (AI becomes more aggressive when opponent has fewer pieces)
+- v21 - 9/5/2019 - (AI understands has a wider definition of dangerous moves)
