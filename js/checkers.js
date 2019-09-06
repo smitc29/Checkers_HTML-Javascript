@@ -1027,3 +1027,23 @@ function ComboJump(selected)
     return Move;
     
 } // End of Function ComboJump
+
+/* Set every checker to be a King, regardless of current status in the game */
+function KingMe()
+{
+    // Make variables then set all black pieces
+    var temp = document.getElementsByClassName("BlackPiece");
+    var i = 0;
+    for(i = 0; i < temp.length; i++)
+    {
+        temp[i].classList.add("King");
+    }
+    
+    // Set all Red pieces
+    temp = document.getElementsByClassName("RedPiece");
+    for(i = 0; i < temp.length; i++)
+    {
+        temp[i].classList.add("King");
+    }
+    
+} // End of function KingMe
