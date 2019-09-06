@@ -305,7 +305,7 @@ function smartMove()
         if(Reaction(list[i]).length >= 1)
         {
             moves.push(list[i]);
-            console.log(moves[temp]);
+            //console.log(moves[temp]);
             temp++;                 
         }
         document.getElementById("AutoplayMode").textContent = 0;
@@ -322,30 +322,49 @@ function smartMove()
         console.log(moves[i].id);
     }
     
-    // Determine if any of the checks can jump another piece via offensive move
-    var vitalMove = [];
-    
-    
-   
-    // Determine if any moves can jump another piece; if so, prioritize making jumps over all other logic
-    if(prioritize(moves, color, opp))
-        return false;
-       
-    if(vitalMove.length > 0)
-    {
-       console.log("\n These pieces can jump another piece: ");
-        for(i = 0; i < vitalMove.length; i++)
+    // If there's no possible moves, immediately end the game and change the message on-screen so that players know
+    if(moves.length < 1 && document.getElementsByClassName(color).length > 0)
         {
-            console.log(vitalMove[i].id);
-        }
-        
-        autoMove(vitalMove, turn);
-        
-    } // VitalMove was empty to reach this point
+            var message = " ";
+            i = false;
+    if(color.includes("Black"))
+   {
+       message = "There's no valid moves for Black checkers; Red wins by default!";
+   }
+    else if(color.includes("Red"))
+   {
+       message = "There's no valid moves for Red checkers; Black wins by default!";
+   }
+    
+    document.getElementById("Message").textContent = message;
+            
+            return false;
+        } // End of no available moves
+    
+    // If the game goes on for too long, make the AI take moves at random to give the player a chance
+    if(turn < 89)
+    {
+        if(prioritize(moves, color, opp))
+        return false;
+    }
+    else if(turn < 149)
+    {
+        if(Math.random() > 0.5)
+            {
+                if(prioritize(moves, color, opp))
+                return false;
+            }
+        else
+            {
+                autoMove(moves);
+            }
+    }
+    else // The game is over 150 turns, just do something
+    {
+        autoMove(moves);
+    }
     
     DeselectAll(); // Ensure nothing is selected atm
-    
-    //autoMove(moves, turn);
        
     return false;
 }
@@ -452,15 +471,30 @@ function prioritize(checks, color, opp)
     // Randomize the order of 'checks'
     var options = checks; 
     var temp = [];
+    var kingLock = 0; // If this is above 3, and there's more than 4 pieces left, force a king to move to prevent blocking itself
     var i = 0, j = 0, value = 0;
+    
     for(i = 0; i < checks.length * 2; i++)
     {
+        
+        // Handle kingLock mechanic
+        if(i < checks.length)
+           {
+                if(parseInt((checks[i].id).substring(4,5)) > 6 && color.includes("Black") ||  parseInt((checks[i].id).substring(4,5)) < 1 && color.includes("Red"))
+                {
+                    kingLock++;
+                }
+           }
+        
+        
+        // Re-order the 'checks' list here
         j = Math.floor(Math.random() * checks.length);
         value = Math.floor(Math.random() * checks.length);
         temp = checks[j];
         checks[j] = options[value];
         options[value] = temp;
-    }
+        
+    } // End of checker order shuffling 
     
     // Grab X value of 1st checker that can be moved, compare it with X value of available movements
     var Xcheck = parseInt((checks[0].id).substring(1,2));
@@ -492,6 +526,11 @@ function prioritize(checks, color, opp)
             {
                 value += 12;
             }
+            
+            if(kingLock > 3 && document.getElementsByClassName(color).length > 4)
+                {
+                    value += 20;
+                }
         }
         else
         {
@@ -640,8 +679,7 @@ function prioritize(checks, color, opp)
     console.log(options);
     console.log(highest);
     console.log(message);
-    
-      
+       
 setTimeout(function () {  
     
     document.getElementById("AutoplayMode").textContent = 1;
@@ -654,7 +692,6 @@ setTimeout(function () {
     
 }, 250);
     
-    
     // No moves were made, return false
     DeselectAll();
     return false;
@@ -662,37 +699,25 @@ setTimeout(function () {
 } // End of function prioritize
 
 /* Takes an array of checkers, randomly selects a checker, than has it make a move without any other logic */
-function autoMove(checks, turn)
+function autoMove(checks)
 {
     
-    // See if autoplay is on for Black or Red
-    var list = document.getElementsByTagName('button');
-    if(list[3].classList.contains("Auto") && turn % 2 == 1 && document.getElementsByClassName("BlackPiece").length > 0 || list[2].classList.contains("Auto") && turn % 2 == 0 && document.getElementsByClassName("RedPiece").length > 0)
-   {
        // Default response for making a move
-    // Click on one of the movable checkers...
-       console.log(list[2].classList.contains("Auto") + " " + list[3].classList.contains("Auto") + " " + turn);
+    // Click on one of the movable checkers at random...  
     document.getElementById("AutoplayMode").textContent = 1;
     var i = Math.floor(Math.random() * checks.length);
-    Reaction(document.getElementById(checks[i].id));
-       
- 
-
-setTimeout(function () {
-               document.getElementById("AutoplayMode").textContent = 0;
-    checks = document.getElementsByClassName("Choice");
-       if(checks.length > 0)
-          {
-            i = Math.floor(Math.random() * checks.length);
-    Reaction(document.getElementById(checks[i].id));
-          }   
-             }, 500);
-       
-    // Randomly select a place to move the checker to based on 'Choice's available
     
-       
-   } // End of autoplay double-check
-    
+    setTimeout(function () { 
+           
+        console.log("autoMove using ValidMoves here");
+    var temp = Reaction(checks[i]);
+    console.log(document.getElementsByClassName("Choice"));
+    setTimeout(function () { // Randomly select a move this piece can make
+    i = Math.floor(Math.random() * temp.length);
+    Reaction(temp[i]); }, 300);
+                        
+    }, 400); // Outer timeout
+     
 } // End of function autoMove()
 
 /* Apply 'Choice' to all valid moves spaces */
@@ -912,6 +937,7 @@ function moveChecker(board, selected, choice)
     // Kingmaking logic
     if(choice.classList.contains("BlackPiece") && Y2 == 7 || choice.classList.contains("RedPiece") && Y2 == 0)
     {
+        console.log("\n Piece at " + selected.id + " has been kinged at " + choice.id + "\n");
         choice.classList.add("King");
     }
     
