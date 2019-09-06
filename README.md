@@ -22,3 +22,4 @@ You should be able to to view the basic development of the project with the Java
 - v21 - 9/5/2019 - (AI understands has a wider definition of dangerous moves)
 - v24 - 9/5/2019 - (AI anticipates potential attacks whenever possible and takes countermeasures)
 - v25 - 9/5/2019 - (AI Kings will jump targets even if it'd move them onto an edge)
+- v28 - 9/5/2019 - (AI avoids leaving 4 kings at one side of the field, AI acts randomly if a game goes on too long)
