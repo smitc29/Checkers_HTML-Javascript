@@ -96,7 +96,7 @@ button
 .noplay
 {
     /* Used purely for aesthetics */
-    background-color: indianred;
+    background-color: #bf4141;
 }
 
 .RedPiece
@@ -154,12 +154,13 @@ button
     background-color: lightsteelblue;
 }
 
-#Counter
+#Counter, #AutoplayMode
 {
     /* Unseen value used to track current turn/player */
     position: absolute;
     z-index: -3;
     opacity: 0;
+    display: none;
 }
 
 -webkit-@keyframes Winner {
