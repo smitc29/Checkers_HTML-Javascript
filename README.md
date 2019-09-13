@@ -24,3 +24,4 @@ You should be able to to view the basic development of the project with the Java
 - v25 - 9/5/2019 - (AI Kings will jump targets even if it'd move them onto an edge)
 - v28 - 9/6/2019 - (AI avoids leaving 4 kings at one side of the field, AI acts randomly if a game goes on too long)
 - v29 - 9/6/2019 - (Made 'King Me' button that sets all checkers to become Kings)
+- v30 - 9/13/2019 - (Hid counter items in html/css files with 'display: none' to ensure they shouldn't appear to viewers at all)
