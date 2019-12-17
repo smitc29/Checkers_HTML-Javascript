@@ -1,5 +1,6 @@
 /*eslint-env browser*/
 /* eslint-disable no-console */ //Enables console output
+// Written by smitc29 / Christopher Smith
 
 function Reaction(item) 
 {
@@ -124,9 +125,15 @@ function DeselectAll()
                         {
                             list[i].style.animationDuration = "0s"; 
                         }
-                    
-                            
-                } // End of IF statement 
+                                        
+                } // End of IF statement      
+            
+           // Remove intro animation from tiles
+            if(parseInt(document.getElementById("Counter").innerHTML) > 3)
+                {
+                    list[i].classList.remove("intro");
+                }
+            
         } // End of For loop 
     
     console.log(" - ");
