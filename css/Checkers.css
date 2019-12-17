@@ -79,12 +79,18 @@ button
     position:absolute;
     top: 0;
     left: 0;
-    transform: scale(0);
+    
     
     background-color: black;
     background-size: cover;
     background-repeat: no-repeat;
     
+    
+}
+
+.intro
+{
+    transform: scale(0);
     animation-name: Expander;
     animation-direction: normal;
     animation-fill-mode: forwards;
